@@ -5,9 +5,14 @@ import (
 	"log"
 	"os"
 
+	"github.com/jessevdk/go-flags"
 	"github.com/jtarchie/ly"
 	lua "github.com/yuin/gopher-lua"
 )
+
+type options struct {
+	ConfigFile string `long:"config" short:"c" description:"the main lua file to execute" required:"true"`
+}
 
 func main() {
 	l := lua.NewState()
@@ -18,7 +23,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	filename := os.Args[1]
+	var opts options
+	_, err := flags.Parse(&opts)
+	if err != nil {
+		fmt.Print(err)
+		os.Exit(1)
+	}
+
+	filename := opts.ConfigFile
 	if err := l.DoFile(filename); err != nil {
 		log.Printf("could not run script: %s", err)
 		os.Exit(1)
