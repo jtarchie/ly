@@ -39,6 +39,8 @@ func (j yamlValue) MarshalYAML() (interface{}, error) {
 		data = float64(converted)
 	case *lua.LNilType:
 		data = nil
+	case null:
+		data = nil
 	case lua.LString:
 		data = string(converted)
 	case *lua.LTable:
@@ -81,7 +83,7 @@ func (j yamlValue) MarshalYAML() (interface{}, error) {
 			return nil, errInvalidKeys
 		}
 	default:
-		return nil, fmt.Errorf(`cannot encode ` + lua.LValueType(j.LValue.Type()).String() + ` to YAML`)
+		return nil, fmt.Errorf("cannot encode %s to YAML", lua.LValueType(j.LValue.Type()).String())
 	}
 	return data, nil
 }

@@ -6,12 +6,11 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/jtarchie/ly"
-	lua "github.com/yuin/gopher-lua"
 )
 
 var _ = Describe("Marhsal", func() {
 	DescribeTable("handles different tables successfully", func(source string, finalContents string) {
-		l := lua.NewState()
+		l := ly.NewState()
 		defer l.Close()
 
 		err := l.DoString(source)
@@ -24,6 +23,7 @@ var _ = Describe("Marhsal", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(contents).To(MatchYAML(finalContents))
 	},
+		Entry("null", "return {null=null}", `"null": ~`),
 		Entry("boolean truth", "return {bool=true}", "bool: true"),
 		Entry("boolean false", "return {bool=false}", "bool: false"),
 		Entry("int", "return {num=1}", "num: 1"),
@@ -34,7 +34,7 @@ var _ = Describe("Marhsal", func() {
 	)
 
 	DescribeTable("errors with tables", func(source string, errMsg string) {
-		l := lua.NewState()
+		l := ly.NewState()
 		defer l.Close()
 
 		err := l.DoString(source)

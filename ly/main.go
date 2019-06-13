@@ -7,7 +7,6 @@ import (
 
 	"github.com/jessevdk/go-flags"
 	"github.com/jtarchie/ly"
-	lua "github.com/yuin/gopher-lua"
 )
 
 type options struct {
@@ -15,7 +14,7 @@ type options struct {
 }
 
 func main() {
-	l := lua.NewState()
+	l := ly.NewState()
 	defer l.Close()
 
 	if len(os.Args) < 2 || os.Args[1] == "" {
