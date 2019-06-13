@@ -33,7 +33,7 @@ var _ = Describe("Marhsal", func() {
 		Entry("nested map", `return {a={b={c=1}}}`, `a: {b: {c: 1}}`),
 	)
 
-	DescribeTable("errors with tables", func(source string) {
+	DescribeTable("errors with tables", func(source string, errMsg string) {
 		l := lua.NewState()
 		defer l.Close()
 
@@ -45,10 +45,11 @@ var _ = Describe("Marhsal", func() {
 
 		_, err = ly.Marshal(table)
 		Expect(err).To(HaveOccurred())
+		Expect(err.Error()).To(ContainSubstring(errMsg))
 	},
-		Entry("a circular reference", `a={a=1}; a["b"]=a; return a`),
-		Entry("a sparse array", `return {[0]=1, [1]=2}`),
-		Entry("a funtion", `return {a=function() end}`),
-		Entry("a boolean as a key", `return {[true]="1", a=1}`),
+		Entry("a circular reference", `a={a=1}; a["b"]=a; return a`, "cannot encode recursively nested tables to YAML"),
+		Entry("a sparse array", `return {[0]=1, [1]=2}`, "cannot encode sparse array"),
+		Entry("a funtion", `return {a=function() end}`, "cannot encode"),
+		Entry("a boolean as a key", `return {[true]="1", a=1}`, "cannot encode mixed or invalid key types"),
 	)
 })
