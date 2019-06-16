@@ -50,7 +50,7 @@ var _ = Describe("Marhsal", func() {
 		},
 			Entry("a circular reference", `a={a=1}; a["b"]=a; return a`, "cannot encode recursively nested tables to YAML"),
 			Entry("a sparse array", `return {[0]=1, [1]=2}`, "cannot encode sparse array"),
-			Entry("a funtion", `return {a=function() end}`, "cannot encode"),
+			Entry("a function", `return {a=function() end}`, "cannot encode"),
 			Entry("a boolean as a key", `return {[true]="1", a=1}`, "cannot encode mixed or invalid key types"),
 		)
 	})
@@ -96,7 +96,7 @@ var _ = Describe("Marhsal", func() {
 		},
 			Entry("a circular reference", `a={a=1}; a["b"]=a; return a`, "cannot encode recursively nested tables to YAML"),
 			Entry("a sparse array", `return {[0]=1, [1]=2}`, "cannot encode sparse array"),
-			Entry("a funtion", `return {a=function() end}`, "cannot encode"),
+			Entry("a function", `return {a=function() end}`, "cannot encode"),
 			Entry("a boolean as a key", `return {[true]="1", a=1}`, "cannot encode mixed or invalid key types"),
 		)
 	})

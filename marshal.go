@@ -100,7 +100,7 @@ func (j marshalValue) MarshalYAML() (interface{}, error) {
 			return nil, errInvalidKeys
 		}
 	default:
-		return nil, fmt.Errorf("cannot encode %s to YAML", lua.LValueType(j.LValue.Type()).String())
+		return nil, fmt.Errorf("cannot encode %s to YAML", j.LValue.Type().String())
 	}
 	return data, nil
 }
