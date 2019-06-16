@@ -11,6 +11,7 @@ import (
 
 type options struct {
 	ConfigFile string `long:"config" short:"c" description:"the main lua file to execute" required:"true"`
+	Format     string `long:"format" short:"f" description:"the output format of the payload (yaml - default, json)"`
 }
 
 func main() {
@@ -42,9 +43,15 @@ func main() {
 	}
 
 	table := l.ToTable(index)
-	payload, err := ly.Marshal(table)
+	var payload []byte
+	switch opts.Format {
+	case "json":
+		payload, err = ly.JSONMarshal(table)
+	default:
+		payload, err = ly.YAMLMarshal(table)
+	}
 	if err != nil {
-		log.Panicf("marshaling yaml: %s", err)
+		log.Panicf("marshaling into format %s: %s", opts.Format, err)
 	}
 	fmt.Println(string(payload))
 }

@@ -1,6 +1,7 @@
 package ly
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -9,16 +10,24 @@ import (
 )
 
 // Encode returns the YAML encoding of value.
-func Marshal(value lua.LValue) ([]byte, error) {
-	return yaml.Marshal(yamlValue{
+func YAMLMarshal(value lua.LValue) ([]byte, error) {
+	return yaml.Marshal(marshalValue{
 		LValue:  value,
 		visited: make(map[*lua.LTable]bool),
 	})
 }
 
-var _ yaml.Marshaler = yamlValue{}
+// Encode returns the JSON encoding of value.
+func JSONMarshal(value lua.LValue) ([]byte, error) {
+	return json.Marshal(marshalValue{
+		LValue:  value,
+		visited: make(map[*lua.LTable]bool),
+	})
+}
 
-type yamlValue struct {
+var _ yaml.Marshaler = marshalValue{}
+
+type marshalValue struct {
 	lua.LValue
 	visited map[*lua.LTable]bool
 }
@@ -29,7 +38,15 @@ var (
 	errInvalidKeys = errors.New("cannot encode mixed or invalid key types")
 )
 
-func (j yamlValue) MarshalYAML() (interface{}, error) {
+func (j marshalValue) MarshalJSON() ([]byte, error) {
+	data, err := j.MarshalYAML()
+	if err != nil {
+		return nil, err
+	}
+	return json.Marshal(data)
+}
+
+func (j marshalValue) MarshalYAML() (interface{}, error) {
 	var data interface{}
 
 	switch converted := j.LValue.(type) {
@@ -55,7 +72,7 @@ func (j yamlValue) MarshalYAML() (interface{}, error) {
 		case lua.LTNil: // empty table
 			data = []int{}
 		case lua.LTNumber:
-			arr := make([]yamlValue, 0, converted.Len())
+			arr := make([]marshalValue, 0, converted.Len())
 			expectedKey := lua.LNumber(1)
 			for key != lua.LNil {
 				if key.Type() != lua.LTNumber {
@@ -64,18 +81,18 @@ func (j yamlValue) MarshalYAML() (interface{}, error) {
 				if expectedKey != key {
 					return nil, errSparseArray
 				}
-				arr = append(arr, yamlValue{value, j.visited})
+				arr = append(arr, marshalValue{value, j.visited})
 				expectedKey++
 				key, value = converted.Next(key)
 			}
 			data = arr
 		case lua.LTString:
-			obj := make(map[string]yamlValue)
+			obj := make(map[string]marshalValue)
 			for key != lua.LNil {
 				if key.Type() != lua.LTString {
 					return nil, errInvalidKeys
 				}
-				obj[key.String()] = yamlValue{value, j.visited}
+				obj[key.String()] = marshalValue{value, j.visited}
 				key, value = converted.Next(key)
 			}
 			data = obj
