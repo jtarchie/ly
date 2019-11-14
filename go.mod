@@ -5,6 +5,8 @@ require (
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/onsi/ginkgo v1.8.0
 	github.com/onsi/gomega v1.5.0
-	github.com/yuin/gopher-lua v0.0.0-20190206043414-8bfc7677f583
-	gopkg.in/yaml.v2 v2.2.2
+	github.com/yuin/gopher-lua v0.0.0-20190514113301-1cd887cd7036
+	gopkg.in/yaml.v2 v2.2.5
 )
+
+go 1.13
