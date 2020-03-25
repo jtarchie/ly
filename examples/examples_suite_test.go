@@ -90,4 +90,21 @@ var _ = Describe("Examples", func() {
 		`
 		Expect(session.Out.Contents()).To(MatchJSON(value))
 	})
+
+	It("supports multiple documents", func() {
+		command := exec.Command(pathToLY, "--config=docs.lua")
+		session, err := gexec.Start(command, GinkgoWriter, GinkgoWriter)
+		Expect(err).NotTo(HaveOccurred())
+
+		Eventually(session).Should(gexec.Exit(0))
+		value := heredoc.Doc(`
+        ---
+        a: 1
+        ---
+        b: 2
+        ---
+        c: 3
+		`)
+		Expect(string(session.Out.Contents())).To(Equal(value))
+	})
 })

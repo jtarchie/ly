@@ -30,28 +30,37 @@ func main() {
 		os.Exit(1)
 	}
 
+	startTop := l.GetTop()
+
 	filename := opts.ConfigFile
 	if err := l.DoFile(filename); err != nil {
 		log.Printf("could not run script: %s", err)
 		os.Exit(1)
 	}
 
-	index := -1
-	if table := l.ToTable(index); table == nil {
-		log.Printf("the last return value of the script must be a table")
-		os.Exit(1)
-	}
+	numReturnedValues := l.GetTop() - startTop
 
-	table := l.ToTable(index)
-	var payload []byte
-	switch opts.Format {
-	case "json":
-		payload, err = ly.JSONMarshal(table)
-	default:
-		payload, err = ly.YAMLMarshal(table)
+	for index := -numReturnedValues; index <= -1; index++ {
+		if table := l.ToTable(index); table == nil {
+			log.Printf("the last return value of the script must be a table")
+			os.Exit(1)
+		}
+
+		table := l.ToTable(index)
+		var payload []byte
+		switch opts.Format {
+		case "json":
+			payload, err = ly.JSONMarshal(table)
+			if err != nil {
+				log.Panicf("marshaling into format %s: %s", opts.Format, err)
+			}
+			fmt.Println(string(payload))
+		default:
+			payload, err = ly.YAMLMarshal(table)
+			if err != nil {
+				log.Panicf("marshaling into format %s: %s", opts.Format, err)
+			}
+			fmt.Printf("---\n%s", string(payload))
+		}
 	}
-	if err != nil {
-		log.Panicf("marshaling into format %s: %s", opts.Format, err)
-	}
-	fmt.Println(string(payload))
 }
