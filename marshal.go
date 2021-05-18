@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	lua "github.com/yuin/gopher-lua"
-	"gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v3"
 )
 
 // Encode returns the YAML encoding of value.
