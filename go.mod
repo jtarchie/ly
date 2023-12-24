@@ -1,6 +1,6 @@
 module github.com/jtarchie/ly
 
-go 1.21.5
+go 1.21
 
 require (
 	github.com/MakeNowJust/heredoc v1.0.0
